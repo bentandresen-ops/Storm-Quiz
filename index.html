@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Storm Quiz</title>
+<style>
+body{
+margin:0;
+font-family:Arial;
+color:white;
+background-image:url("https://images.unsplash.com/photo-1500375592092-40eb2168fd21");
+background-size:cover;
+background-position:center;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+.quiz{
+background:rgba(0,0,0,0.75);
+padding:40px;
+border-radius:20px;
+width:550px;
+text-align:center;
+}
+.option{
+margin:10px;
+padding:14px;
+border-radius:10px;
+background:rgba(255,255,255,0.1);
+cursor:pointer;
+transition:background 0.6s ease, transform 0.2s;
+}
+.option:hover{
+background:rgba(255,255,255,0.25);
+transform:scale(1.03);
+}
+.correct{ background:rgba(0,200,0,0.7) !important; }
+.wrong{ background:rgba(200,0,0,0.7) !important; }
+button{
+margin-top:20px;
+padding:10px 20px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+#bar{
+height:10px;
+background:lime;
+width:0%;
+transition:0.4s;
+}
+#progressBar{
+background:rgba(255,255,255,0.2);
+border-radius:5px;
+overflow:hidden;
+margin-top:15px;
+}
+</style>
+</head>
+<body>
+<div class="quiz">
+<h1>Sturm Quiz 🌪️</h1>
+<h2 id="frage"></h2>
+<div id="options"></div>
+<div id="feedback"></div>
+<div id="progressBar"><div id="bar"></div></div>
+<p id="progress"></p>
+</div>
+
+<script>
+let fragen=[
+{
+frage:"Warum sind Hurrikans gefährlich?",
+antworten:[
+{text:"Weil sie viel Wind und Regen haben",richtig:true},
+{text:"Weil sie leise sind",richtig:false},
+{text:"Weil sie kalt sind",richtig:false},
+{text:"Weil sie unsichtbar sind",richtig:false}
+]
+},
+{
+frage:"Was beschreibt einen Tornado am besten?",
+antworten:[
+{text:"Ein drehender Luftwirbel",richtig:true},
+{text:"Ein ruhiger Himmel",richtig:false},
+{text:"Ein Fluss",richtig:false},
+{text:"Ein Berg",richtig:false}
+]
+}
+];
+
+// Fragen auffüllen
+for(let i=2;i<22;i++){
+fragen.push({
+frage:"Was ist die größte Gefahr bei Stürmen?",
+antworten:[
+{text:"Schäden durch Wind und Wasser",richtig:true},
+{text:"Nur laute Geräusche",richtig:false},
+{text:"Nur Wolken",richtig:false},
+{text:"Nur Dunkelheit",richtig:false}
+]
+});
+}
+
+let aktuelle=0;
+let punkte=0;
+
+function shuffle(arr){
+for(let i=arr.length-1;i>0;i--){
+let j=Math.floor(Math.random()*(i+1));
+[arr[i],arr[j]]=[arr[j],arr[i]];
+}
+return arr;
+}
+
+function show(){
+let q=fragen[aktuelle];
+q.mix=shuffle([...q.antworten]);
+
+document.getElementById("frage").innerText=q.frage;
+let cont=document.getElementById("options");
+cont.innerHTML="";
+
+q.mix.forEach(a=>{
+let d=document.createElement("div");
+d.className="option";
+d.innerText=a.text;
+d.onclick=()=>check(d,a);
+cont.appendChild(d);
+});
+
+updateBar();
+document.getElementById("progress").innerText=
+"Frage "+(aktuelle+1)+" / "+fragen.length;
+}
+
+function check(el,a){
+let all=document.querySelectorAll(".option");
+all.forEach(o=>o.onclick=null);
+
+if(a.richtig){
+punkte++;
+el.classList.add("correct");
+}else{
+el.classList.add("wrong");
+
+all.forEach(o=>{
+if(o.innerText===fragen[aktuelle].antworten.find(x=>x.richtig).text){
+o.classList.add("correct");
+}
+});
+}
+
+document.getElementById("feedback").innerHTML=
+"<button onclick='next()'>Weiter</button>";
+}
+
+function updateBar(){
+document.getElementById("bar").style.width=
+(aktuelle/fragen.length*100)+"%";
+}
+
+function next(){
+aktuelle++;
+if(aktuelle>=fragen.length){
+document.querySelector(".quiz").innerHTML=
+"<h1>Fertig 🌪️</h1><p>Punkte: "+punkte+"</p>";
+}else{
+show();
+}
+}
+
+show();
+</script>
+</body>
+</html>
